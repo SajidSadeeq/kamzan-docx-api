@@ -155,8 +155,9 @@ def replace_text_in_paragraph(paragraph, key, value):
         for item in inline:
             if key in item.text:
                 item.text = item.text.replace(key, value)
-app.run(debug=True ,port=8080,use_reloader=False)
+# app.run(debug=True ,port=8080,use_reloader=False)
 # loop
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    app.run()
 #     from waitress import serve
 #     serve(debug=True ,port=8080,use_reloader=False)
