@@ -159,4 +159,4 @@ def replace_text_in_paragraph(paragraph, key, value):
 # loop
 if __name__ == "__main__":
     from waitress import serve
-    serve(app, host="0.0.0.0", port=8080)
+    serve(debug=True ,port=8080,use_reloader=False)
