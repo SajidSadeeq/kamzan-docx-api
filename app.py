@@ -8,7 +8,7 @@ import os
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config["DEBUG"] = True
+# app.config["DEBUG"] = True
 app.config['UPLOAD_FOLDER'] = 'upload'
 CORS(app)
 
