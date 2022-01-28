@@ -9,8 +9,8 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 # app.config["DEBUG"] = True
-UPLOAD_FOLDER = './uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
+# UPLOAD_FOLDER = './uploads'
+# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
 CORS(app)
 
 # @app.route('/<name>')
@@ -69,7 +69,8 @@ def first_api():
         if "document" in request.files:
             document = request.files["document"]
             template_file_path = document.filename
-            document.save(os.path.join(app.config['UPLOAD_FOLDER'],document.filename))
+            # document.save(os.path.join(app.config['UPLOAD_FOLDER'],document.filename))
+            document.save(os.path.join(document.filename))
             template_document = Document(template_file_path)
             
             replacesImageName = []
