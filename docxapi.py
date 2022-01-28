@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 # app.config["DEBUG"] = True
 UPLOAD_FOLDER = '/var/www/docxapi/uploads'
+# UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
 CORS(app)
 
@@ -71,21 +72,22 @@ def first_api():
             template_file_path = document.filename
             document.save(os.path.join(app.config['UPLOAD_FOLDER'],document.filename))
             # document.save(os.path.join(document.filename))
-            template_document = Document(template_file_path)
+            # print("path: "+app.config['UPLOAD_FOLDER']+'/'+template_file_path)
+            template_document = Document(app.config['UPLOAD_FOLDER']+'/'+template_file_path)
             
             replacesImageName = []
             files = request.files.getlist("replace_images[]")
             for file in files:
                 print(file.filename)
-                replacesImageName.append(file.filename)
-                file.save(os.path.join(file.filename))
+                replacesImageName.append(app.config['UPLOAD_FOLDER']+'/'+file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'],file.filename))
                 
             findsImageName = []
             files = request.files.getlist("find_images[]")
             for file in files:
                 print(file.filename)
-                findsImageName.append(file.filename)
-                file.save(os.path.join(file.filename))
+                findsImageName.append(app.config['UPLOAD_FOLDER']+'/'+file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'],file.filename))
             
             find_text = request.form.getlist('find_text[]')
             replace_text = request.form.getlist('replace_text[]')
@@ -118,9 +120,10 @@ def first_api():
                         for hf in section.footer.paragraphs:
                             replace_text_in_paragraph(hf, word['find'], word['replace'])
 
-            template_document.save(output_file_path)
+            # template_document.save(output_file_path)
+            template_document.save(os.path.join(app.config['UPLOAD_FOLDER'],output_file_path))
             
-            doc = DocxTemplate(output_file_path)
+            doc = DocxTemplate(app.config['UPLOAD_FOLDER']+'/'+output_file_path)
             doc.reset_replacements()
             if len(findsImageName) == len(replacesImageName):
                 for i in range(len(findsImageName)):
@@ -128,8 +131,8 @@ def first_api():
             # doc.replace_media('header.jpg','header-replace.jpg')
             # doc.replace_media('main.png','main-replace.png')
             # doc.replace_media('map.png','map-replace.png')
-            return_file = doc
-            doc.save(output_file_path)
+            # return_file = doc
+            doc.save(os.path.join(app.config['UPLOAD_FOLDER'],output_file_path))
             # words = request.form.getlist('words')
             # return send_from_directory(directory='/', filename=return_file, as_attachment=True)
             # filename = os.path.join(app.root_path, '/', output_file_path)
@@ -149,7 +152,7 @@ def first_api():
     '''
 @app.route('/download/<filename>')
 def downloadFile (filename):
-    return send_file(filename, as_attachment=True)
+    return send_file(app.config['UPLOAD_FOLDER']+'/'+filename, as_attachment=True)
 
 def replace_text_in_paragraph(paragraph, key, value):
     if key in paragraph.text:
