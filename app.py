@@ -12,9 +12,9 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'upload'
 CORS(app)
 
-@app.route('/<name>')
-def index(name):
-    return '<h1>Hello </h1>'.format(name)
+# @app.route('/<name>')
+# def index(name):
+#     return '<h1>Hello </h1>'.format(name)
 
 @app.route('/', methods=['GET'])
 def home():
