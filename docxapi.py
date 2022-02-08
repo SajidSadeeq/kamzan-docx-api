@@ -10,8 +10,8 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 # app.config["DEBUG"] = True
-# UPLOAD_FOLDER = '/var/www/docxapi/uploads'
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = '/var/www/docxapi/uploads'
+# UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
 CORS(app)
 
