@@ -11,7 +11,7 @@ app = Flask(__name__)
 # app.config["DEBUG"] = True
 UPLOAD_FOLDER = '/var/www/docxapi/uploads'
 # UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 CORS(app)
 
 # @app.route('/<name>')
@@ -115,6 +115,18 @@ def first_api():
                     for section in template_document.sections:
                         for hf in section.header.paragraphs:
                             replace_text_in_paragraph(hf, word['find'], word['replace'])
+
+                        for dfh in section.header.paragraphs:
+                            if word['find'] in dfh.text:
+                                dfh.text = dfh.text.replace(word['find'], word['replace'])
+                                # replace_text_in_paragraph(dfh, word['find'], word['replace'])
+                    
+                    for section in template_document.sections:
+                        for df in section.first_page_footer.paragraphs:
+                            if word['find'] in df.text:
+                                df.text = df.text.replace(word['find'], word['replace'])
+                                # df.text = df.text.replace(word['find'], word['replace'])
+                            # replace_text_in_paragraph(df, word['find'], word['replace'])
                             
                     for section in template_document.sections:
                         for hf in section.footer.paragraphs:
