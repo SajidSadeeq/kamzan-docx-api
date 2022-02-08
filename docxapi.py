@@ -152,7 +152,7 @@ def first_api():
     '''
 @app.route('/download/<filename>')
 def downloadFile (filename):
-    return send_file(app.config['UPLOAD_FOLDER']+'/'+filename, as_attachment=True)
+    return send_file('uploads/'+filename, as_attachment=True)
 
 def replace_text_in_paragraph(paragraph, key, value):
     if key in paragraph.text:
