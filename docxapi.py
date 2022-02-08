@@ -5,13 +5,14 @@ from docxtpl import DocxTemplate
 from docx import Document
 from flask_cors import CORS
 import os
+import re
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 # app.config["DEBUG"] = True
-UPLOAD_FOLDER = '/var/www/docxapi/uploads'
-# UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# UPLOAD_FOLDER = '/var/www/docxapi/uploads'
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
 CORS(app)
 
 # @app.route('/<name>')
@@ -98,39 +99,62 @@ def first_api():
                     prepareWord['find'] = find_text[i]
                     prepareWord['replace'] = replace_text[i]
                     words.append(prepareWord)
-            
+                    
             if words:
                 # words = request_data['inputF']
                 for word in words:
-                    print("word : ",word['find'])
+                    # print("word : ",word['find'])
+                    
                     for paragraph in template_document.paragraphs:
-                        replace_text_in_paragraph(paragraph, word['find'], word['replace'])
+                        if word['find'] in paragraph.text:
+                            paragraph.text = paragraph.text.replace(word['find'], word['replace'])
+                            # replace_text_in_paragraph(paragraph, word['find'], word['replace'])
 
                     for table in template_document.tables:
-                        for col in table.columns:
+                        for col in table.rows:
                             for cell in col.cells:
                                 for paragraph in cell.paragraphs:
-                                    replace_text_in_paragraph(paragraph, word['find'], word['replace'])
+                                    if word['find'] in paragraph.text:
+                                        paragraph.text = paragraph.text.replace(word['find'], word['replace'])
+                                        # replace_text_in_paragraph(paragraph, word['find'], word['replace'])
+                                        
+                    
+                    # for table in template_document.tables:
+                    #     for row in table.rows:
+                    #         for cell in row.cells:
+                    #             for paragraph in cell.paragraphs:
+                    #                 replace_text_in_paragraph(paragraph, word['find'], word['replace'])
+                
+                for word in words:
+    
+                    for section in template_document.sections:
+                        for dh in section.first_page_header.paragraphs:
+                            if(word['find'] in dh.text):
+                                dh.text = dh.text.replace(word['find'], word['replace'])
+                                # replace_text_in_paragraph(dh, word['find'], word['replace'])
                     
                     for section in template_document.sections:
-                        for hf in section.header.paragraphs:
-                            replace_text_in_paragraph(hf, word['find'], word['replace'])
-
                         for dfh in section.header.paragraphs:
                             if word['find'] in dfh.text:
                                 dfh.text = dfh.text.replace(word['find'], word['replace'])
                                 # replace_text_in_paragraph(dfh, word['find'], word['replace'])
-                    
+                                
+                    # iteration = 0
                     for section in template_document.sections:
                         for df in section.first_page_footer.paragraphs:
+                            # iteration += 1
                             if word['find'] in df.text:
                                 df.text = df.text.replace(word['find'], word['replace'])
                                 # df.text = df.text.replace(word['find'], word['replace'])
                             # replace_text_in_paragraph(df, word['find'], word['replace'])
+                            # if iteration == 1:
+                            #     break
                             
                     for section in template_document.sections:
-                        for hf in section.footer.paragraphs:
-                            replace_text_in_paragraph(hf, word['find'], word['replace'])
+                        for dff in section.footer.paragraphs:
+                            if word['find'] in dff.text:
+                                dff.text = dff.text.replace(word['find'], word['replace'])
+                                replace_text_in_paragraph(dff, word['find'], word['replace'])
 
             # template_document.save(output_file_path)
             template_document.save(os.path.join(app.config['UPLOAD_FOLDER'],output_file_path))
