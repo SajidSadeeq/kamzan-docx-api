@@ -144,7 +144,6 @@ def first_api():
                                 df.text = df.text.replace(word['find'], word['replace'])
                                 # df.text = df.text.replace(word['find'], word['replace'])
                             # replace_text_in_paragraph(df, word['find'], word['replace'])
-                    break
                             
                     # for section in template_document.sections:
                     #     for dff in section.footer.paragraphs:
