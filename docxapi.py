@@ -7,8 +7,8 @@ from flask_cors import CORS
 import inspect, os
 import re
 from werkzeug.utils import secure_filename
-import win32com.client
-import pythoncom
+# import win32com.client
+# import pythoncom
 
 app = Flask(__name__)
 # app.config["DEBUG"] = True
@@ -182,7 +182,7 @@ def first_api():
             script_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             # print("script_dir : "+file_path_toc)
             # print("script_dir : "+os.path.join(script_dir,file_path_toc))
-            update_toc(os.path.join(script_dir,file_path_toc))
+            # update_toc(os.path.join(script_dir,file_path_toc))
             
             # words = request.form.getlist('words')
             # return send_from_directory(directory='/', filename=return_file, as_attachment=True)
