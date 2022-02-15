@@ -1,0 +1,5 @@
+
+py -m pip install --upgrade pip
+
+pip install pywin32
+
