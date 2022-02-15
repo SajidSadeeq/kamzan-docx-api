@@ -192,7 +192,6 @@ def first_api():
             #                 message= "Success",
             #                 statusCode= 200,
             #                 data= output_file_path), 200
-            # print("path : "+output_file_path)
             return send_from_directory(app.config["UPLOAD_FOLDER"], 'result.docx', as_attachment=True)
             
     return '''
