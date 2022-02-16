@@ -166,7 +166,8 @@ def first_api():
                                 replace_text_in_paragraph(dff, word['find'], word['replace'])
 
             # template_document.save(output_file_path)
-            template_document.save(os.path.join(app.config['UPLOAD_FOLDER'],output_file_path))
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'],output_file_path)
+            template_document.save(file_path)
             
             doc = DocxTemplate(app.config['UPLOAD_FOLDER']+'/'+output_file_path)
             doc.reset_replacements()
@@ -177,8 +178,8 @@ def first_api():
             # doc.replace_media('main.png','main-replace.png')
             # doc.replace_media('map.png','map-replace.png')
             # return_file = doc
-            doc.save(os.path.join(app.config['UPLOAD_FOLDER'],output_file_path))
-            file_path_toc = os.path.join(app.config['UPLOAD_FOLDER'],output_file_path)
+            doc.save(file_path)
+            file_path_toc = file_path
             script_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             # print("script_dir : "+file_path_toc)
             # print("script_dir : "+os.path.join(script_dir,file_path_toc))
@@ -188,11 +189,12 @@ def first_api():
             # return send_from_directory(directory='/', filename=return_file, as_attachment=True)
             # filename = os.path.join(app.root_path, '/', output_file_path)
             # return_data = [os.path.dirname(app.instance_path), output_file_path]
-            # return jsonify(isError= False,
-            #                 message= "Success",
-            #                 statusCode= 200,
-            #                 data= output_file_path), 200
-            return send_from_directory(app.config["UPLOAD_FOLDER"], 'result.docx', as_attachment=True)
+            download_file_url = request.url_root+"download/result.docx"
+            return jsonify(isError= False,
+                            message= "Success",
+                            statusCode= 200,
+                            data= download_file_url), 200
+            # return send_from_directory(app.config["UPLOAD_FOLDER"], 'result.docx', as_attachment=True)
             
     return '''
     <!doctype html>
