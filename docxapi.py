@@ -190,10 +190,15 @@ def first_api():
             # filename = os.path.join(app.root_path, '/', output_file_path)
             # return_data = [os.path.dirname(app.instance_path), output_file_path]
             download_file_url = request.url_root+"download/result.docx"
+            
+            # return jsonify(isError= False,
+            #                 message= "Success",
+            #                 statusCode= 200,
+            #                 data= download_file_url), 200
             return jsonify(isError= False,
                             message= "Success",
                             statusCode= 200,
-                            data= download_file_url), 200
+                            data= 'result.docx'), 200
             # return send_from_directory(app.config["UPLOAD_FOLDER"], 'result.docx', as_attachment=True)
             
     return '''
