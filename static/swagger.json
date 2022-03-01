@@ -1,0 +1,63 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "description": "Kamzan",
+      "version": "1.0.0",
+      "title": "Kamzan docx text and images find/replace"
+    },
+    "tags": [
+      {
+        "name": "Docx Api", 
+        "description": "Docx API for requesting and return file"
+      }
+    ],
+    "paths": {
+      "/request": { 
+        "post": {
+          "tags": [
+            "Docx Api"
+          ],
+          "summary": "Docx API for requesting and return file",
+          "requestBody": {
+            "description": "Docx Request Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/params"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "params": {
+          "properties": {
+            "document": {
+              "type": "file",
+              "format": "docx"
+            },
+            "find_text[]": {
+              "type": "[]",
+              "format": "array"
+            },
+            "replace_text[]": {
+              "type": "[]",
+              "format": "array"
+            },
+            "find_images[]": {
+              "type": "[]",
+              "format": "array"
+            },
+            "replace_images[]": {
+              "type": "[]",
+              "format": "array"
+            }
+          }
+        }
+      }
+    }
+  }

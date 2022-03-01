@@ -7,10 +7,28 @@ from flask_cors import CORS
 import inspect, os
 import re
 from werkzeug.utils import secure_filename
+from flask_swagger_ui import get_swaggerui_blueprint
+# from routes import request_api
 # import win32com.client
 # import pythoncom
 
 app = Flask(__name__)
+
+### swagger specific ###
+SWAGGER_URL = '/docs'
+API_URL = '/static/swagger.json'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Seans-Python-Flask-REST-Boilerplate"
+    }
+)
+app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+### end swagger specific ###
+# app.register_blueprint(request_api.get_blueprint())
+
+
 # app.config["DEBUG"] = True
 UPLOAD_FOLDER = '/var/www/docxapi/uploads'
 # UPLOAD_FOLDER = 'uploads'
@@ -25,43 +43,9 @@ CORS(app)
 def home():
     return "<h1>Distant Reading Archive</h1><p>This site is a prototype API for distant reading of science fiction novels.</p>"
 
-# Create some test data for our catalog in the form of a list of dictionaries.
-books = [
-    {'id': 0,
-     'title': 'A Fire Upon the Deep',
-     'author': 'Vernor Vinge',
-     'first_sentence': 'The coldsleep itself was dreamless.',
-     'year_published': '1992'},
-    {'id': 1,
-     'title': 'The Ones Who Walk Away From Omelas',
-     'author': 'Ursula K. Le Guin',
-     'first_sentence': 'With a clamor of bells that set the swallows soaring, the Festival of Summer came to the city Omelas, bright-towered by the sea.',
-     'published': '1973'},
-    {'id': 2,
-     'title': 'Dhalgren',
-     'author': 'Samuel R. Delany',
-     'first_sentence': 'to wound the autumnal city.',
-     'published': '1975'}
-]
-
-# A route to return all of the available entries in our catalog.
-@app.route('/api/v1/resources/books', methods=['GET'])
-def api_all():
-    # Check if an ID was provided as part of the URL.
-    # If ID is provided, assign it to a variable.
-    # If no ID is provided, display an error in the browser.
-    if 'id' in request.args:
-        id = int(request.args['id'])
-    else:
-        return "Error: No id field provided. Please specify an id."
-    
-    results = []
-    
-    for book in books:
-        if book['id'] == id:
-            results.append(book)
-    
-    return jsonify(results)
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
 
 def update_toc(docx_file):
     word = win32com.client.DispatchEx("Word.Application", pythoncom.CoInitialize())
@@ -139,13 +123,17 @@ def first_api():
                     for section in template_document.sections:
                         for dh in section.first_page_header.paragraphs:
                             if(word['find'] in dh.text):
-                                dh.text = dh.text.replace(word['find'], word['replace'])
+                                if(dh.text.bold):
+                                    word['replace'].bold = True
+                                    dh.text = dh.text.replace(word['find'], word['replace'])
                                 # replace_text_in_paragraph(dh, word['find'], word['replace'])
                     
                     for section in template_document.sections:
                         for dfh in section.header.paragraphs:
                             if word['find'] in dfh.text:
-                                dfh.text = dfh.text.replace(word['find'], word['replace'])
+                                if(dfh.text.bold):
+                                    word['replace'].bold = True
+                                    dfh.text = dfh.text.replace(word['find'], word['replace'])
                                 # replace_text_in_paragraph(dfh, word['find'], word['replace'])
                                 
                     # iteration = 0
@@ -153,7 +141,9 @@ def first_api():
                         for df in section.first_page_footer.paragraphs:
                             # iteration += 1
                             if word['find'] in df.text:
-                                df.text = df.text.replace(word['find'], word['replace'])
+                                if(dfh.text.bold):
+                                    word['replace'].bold = True
+                                    df.text = df.text.replace(word['find'], word['replace'])
                                 # df.text = df.text.replace(word['find'], word['replace'])
                             # replace_text_in_paragraph(df, word['find'], word['replace'])
                             # if iteration == 1:
@@ -162,8 +152,10 @@ def first_api():
                     for section in template_document.sections:
                         for dff in section.footer.paragraphs:
                             if word['find'] in dff.text:
-                                dff.text = dff.text.replace(word['find'], word['replace'])
-                                replace_text_in_paragraph(dff, word['find'], word['replace'])
+                                if(dff.text.bold):
+                                    word['replace'].bold = True
+                                    dff.text = dff.text.replace(word['find'], word['replace'])
+                                # replace_text_in_paragraph(dff, word['find'], word['replace'])
 
             # template_document.save(output_file_path)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'],output_file_path)
@@ -195,21 +187,23 @@ def first_api():
             #                 message= "Success",
             #                 statusCode= 200,
             #                 data= download_file_url), 200
+            
             return jsonify(isError= False,
                             message= "Success",
                             statusCode= 200,
                             data= 'result.docx'), 200
             # return send_from_directory(app.config["UPLOAD_FOLDER"], 'result.docx', as_attachment=True)
+        else:
+            return jsonify(isError= False,
+                            message= "Document Not Found",
+                            statusCode= 200,
+                            data= [])
+    else:
+        return jsonify(isError= False,
+                        message= "Request method not allowed",
+                        statusCode= 200,
+                        data= [])
             
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file[] multiple=true>
-      <input type=submit value=Upload>
-    </form>
-    '''
 @app.route('/download/<filename>')
 def downloadFile (filename):
     return send_file('uploads/'+filename, as_attachment=True)
