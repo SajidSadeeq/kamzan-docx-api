@@ -92,15 +92,18 @@ def first_api():
                     prepareWord['find'] = find_text[i]
                     prepareWord['replace'] = replace_text[i]
                     words.append(prepareWord)
-                    
+            words_not_replace = []
             if words:
-                # words = request_data['inputF']
                 for word in words:
-                    # print("word : ",word['find'])
-                    
                     for paragraph in template_document.paragraphs:
                         if word['find'] in paragraph.text:
-                            paragraph.text = paragraph.text.replace(word['find'], word['replace'])
+                            inline = paragraph.runs
+                            for i in range(len(inline)):
+                                if word['find'] in inline[i].text:
+                                    text = inline[i].text.replace(word['find'], word['replace'])
+                                    inline[i].text = text
+                                    # paragraph.text = paragraph.text.replace(word['find'], word['replace'])
+                            # paragraph.text = paragraph.text.replace(word['find'], word['replace'])
                             # replace_text_in_paragraph(paragraph, word['find'], word['replace'])
 
                     for table in template_document.tables:
@@ -108,7 +111,17 @@ def first_api():
                             for cell in col.cells:
                                 for paragraph in cell.paragraphs:
                                     if word['find'] in paragraph.text:
-                                        paragraph.text = paragraph.text.replace(word['find'], word['replace'])
+                                        inline = paragraph.runs
+                                        for i in range(len(inline)):
+                                            if word['find'] in inline[i].text:
+                                                text = inline[i].text.replace(word['find'], word['replace'])
+                                                inline[i].text = text
+                                            else:
+                                                prepareWord = {}
+                                                prepareWord['find'] = word['find']
+                                                prepareWord['replace'] = word['replace']
+                                                words_not_replace.append(prepareWord)
+                                                # paragraph.text = paragraph.text.replace(word['find'], word['replace'])
                                         # replace_text_in_paragraph(paragraph, word['find'], word['replace'])
                                         
                     
@@ -117,16 +130,21 @@ def first_api():
                     #         for cell in row.cells:
                     #             for paragraph in cell.paragraphs:
                     #                 replace_text_in_paragraph(paragraph, word['find'], word['replace'])
+                for rword in words_not_replace:
+                    for table in template_document.tables:
+                        for col in table.rows:
+                            for cell in col.cells:
+                                for paragraph in cell.paragraphs:
+                                    if rword['find'] in paragraph.text:
+                                        paragraph.text = paragraph.text.replace(rword['find'], rword['replace'])
                 
                 for word in words:
-    
                     for section in template_document.sections:
                         for dh in section.first_page_header.paragraphs:
                             if(word['find'] in dh.text):
                                 if(dh.text.bold):
                                     word['replace'].bold = True
                                     dh.text = dh.text.replace(word['find'], word['replace'])
-                                # replace_text_in_paragraph(dh, word['find'], word['replace'])
                     
                     for section in template_document.sections:
                         for dfh in section.header.paragraphs:
@@ -134,28 +152,16 @@ def first_api():
                                 if(dfh.text.bold):
                                     word['replace'].bold = True
                                     dfh.text = dfh.text.replace(word['find'], word['replace'])
-                                # replace_text_in_paragraph(dfh, word['find'], word['replace'])
-                                
-                    # iteration = 0
+                    #
                     for section in template_document.sections:
                         for df in section.first_page_footer.paragraphs:
-                            # iteration += 1
                             if word['find'] in df.text:
-                                if(dfh.text.bold):
-                                    word['replace'].bold = True
-                                    df.text = df.text.replace(word['find'], word['replace'])
-                                # df.text = df.text.replace(word['find'], word['replace'])
-                            # replace_text_in_paragraph(df, word['find'], word['replace'])
-                            # if iteration == 1:
-                            #     break
+                                df.text = df.text.replace(word['find'], word['replace'])
                             
                     for section in template_document.sections:
                         for dff in section.footer.paragraphs:
                             if word['find'] in dff.text:
-                                if(dff.text.bold):
-                                    word['replace'].bold = True
-                                    dff.text = dff.text.replace(word['find'], word['replace'])
-                                # replace_text_in_paragraph(dff, word['find'], word['replace'])
+                                dff.text = dff.text.replace(word['find'], word['replace'])
 
             # template_document.save(output_file_path)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'],output_file_path)
@@ -194,12 +200,12 @@ def first_api():
                             data= 'result.docx'), 200
             # return send_from_directory(app.config["UPLOAD_FOLDER"], 'result.docx', as_attachment=True)
         else:
-            return jsonify(isError= False,
+            return jsonify(isError= True,
                             message= "Document Not Found",
                             statusCode= 200,
                             data= [])
     else:
-        return jsonify(isError= False,
+        return jsonify(isError= True,
                         message= "Request method not allowed",
                         statusCode= 200,
                         data= [])
